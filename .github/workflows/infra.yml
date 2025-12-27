@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tf-plan-file
-          path: tfplan
+          path: environments/dev/tfplan
 
   apply:
     name: "Manual Approval & Apply"
