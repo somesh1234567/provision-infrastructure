@@ -77,7 +77,7 @@ jobs:
 
   destroy:
     name: "Manual Destroy"
-    needs: plan
+    needs: apply
     environment: dev  # This triggers the CTO's approval gate
     runs-on: ubuntu-latest
     defaults:
