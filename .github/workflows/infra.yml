@@ -2,14 +2,23 @@ name: "Production Grade Terraform"
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
 
 jobs:
   plan:
-    name: "Generate Plan"
+    name: "Generate Plan for ${{ github.event.inputs.environment }} Environment"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./environments/dev
+    env:
+      TF_WORKING_DIR: "./environments/${{ github.event.inputs.environment }}"
     steps:
       - name: "Configure AWS Credentials"
         uses: aws-actions/configure-aws-credentials@v4
@@ -28,26 +37,27 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Plan
         # We save the plan to a binary file called 'tfplan'
         run: terraform plan -input=false -out=tfplan
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Upload Plan Artifact
         # This saves the 'tfplan' file so the next job can download it
         uses: actions/upload-artifact@v4
         with:
-          name: tf-plan-file
-          path: environments/dev/tfplan
+          name: ${{ github.event.inputs.environment }}-tf-plan-file
+          path: ${{ env.TF_WORKING_DIR }}/tfplan
 
   apply:
-    name: "Manual Approval & Apply"
+    name: "Manual Approval & Apply: ${{ github.event.inputs.environment }} Environment"
     needs: plan
-    environment: dev  # This triggers the CTO's approval gate
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./environments/dev
+    environment: ${{ github.event.inputs.environment }}
+    env:
+      TF_WORKING_DIR: "./environments/${{ github.event.inputs.environment }}"
     steps:
       - name: "Configure AWS Credentials"
         uses: aws-actions/configure-aws-credentials@v4
@@ -62,18 +72,20 @@ jobs:
       - name: Download Plan Artifact
         uses: actions/download-artifact@v4
         with:
-          name: tf-plan-file
-          path: ./environments/dev/
+          name: ${{ github.event.inputs.environment }}-tf-plan-file
+          path: ${{ env.TF_WORKING_DIR }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Apply
         # We apply the EXACT file we generated in the Plan job
         run: terraform apply -auto-approve tfplan
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
   destroy:
     name: "Manual Destroy"
@@ -82,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./environments/dev
+        working-directory: ./environments/${{ github.event.inputs.environment }}
     steps:
       - name: "Configure AWS Credentials"
         uses: aws-actions/configure-aws-credentials@v4
