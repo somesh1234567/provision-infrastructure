@@ -41,7 +41,7 @@ jobs:
 
       - name: Terraform Plan
         # We save the plan to a binary file called 'tfplan'
-        run: terraform plan -input=false -var-file="./environments/${{ github.event.inputs.environment }}.tfvars" -out=tfplan
+        run: terraform plan -input=false -var-file="${{ github.event.inputs.environment }}.tfvars" -out=tfplan
         working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Upload Plan Artifact
