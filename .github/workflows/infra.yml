@@ -84,7 +84,7 @@ jobs:
 
       - name: Terraform Apply
         # We apply the EXACT file we generated in the Plan job
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -var-file="${{ github.event.inputs.environment }}.tfvars" -auto-approve tfplan
         working-directory: ${{ env.TF_WORKING_DIR }}
 
   destroy:
