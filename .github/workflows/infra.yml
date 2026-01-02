@@ -109,8 +109,8 @@ jobs:
       - name: Download Plan Artifact
         uses: actions/download-artifact@v4
         with:
-          name: tf-plan-file
-          path: ./environments/dev/
+          name: ${{ github.event.inputs.environment }}-tf-plan-file
+          path: ./environments/${{ github.event.inputs.environment }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
