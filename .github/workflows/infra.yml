@@ -120,4 +120,4 @@ jobs:
 
       - name: Terraform Destroy
         # We apply the EXACT file we generated in the Plan job
-        run: terraform destroy -auto-approve
+        run: terraform destroy -var-file=./environments/dev/dev.tfvars -auto-approve
