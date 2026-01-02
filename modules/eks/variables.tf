@@ -1,8 +1,7 @@
-variable "aws-region" {}
-variable "env" {}
 variable "cluster-name" {}
-variable "vpc-cidr-block" {}
+variable "cidr-block" {}
 variable "vpc-name" {}
+variable "env" {}
 variable "igw-name" {}
 variable "pub-subnet-count" {}
 variable "pub-cidr-block" {
@@ -26,16 +25,26 @@ variable "eip-name" {}
 variable "ngw-name" {}
 variable "eks-sg" {}
 
+#IAM
+variable "is_eks_role_enabled" {
+  type = bool
+}
+variable "is_eks_nodegroup_role_enabled" {
+  type = bool
+}
 
 # EKS
 variable "is-eks-cluster-enabled" {}
 variable "cluster-version" {}
 variable "endpoint-private-access" {}
 variable "endpoint-public-access" {}
-variable "ondemand_instance_types" {
-  default = ["t3a.medium"]
+variable "addons" {
+  type = list(object({
+    name    = string
+    version = string
+  }))
 }
-
+variable "ondemand_instance_types" {}
 variable "spot_instance_types" {}
 variable "desired_capacity_on_demand" {}
 variable "min_capacity_on_demand" {}
@@ -43,9 +52,3 @@ variable "max_capacity_on_demand" {}
 variable "desired_capacity_spot" {}
 variable "min_capacity_spot" {}
 variable "max_capacity_spot" {}
-variable "addons" {
-  type = list(object({
-    name    = string
-    version = string
-  }))
-}
