@@ -120,5 +120,5 @@ jobs:
 
       - name: Terraform Destroy
         # We apply the EXACT file we generated in the Plan job
-        run: terraform destroy -var-file="${{ github.event.inputs.environment }}.tfvars" -auto-approve tfplan
+        run: terraform destroy -var-file="${{ github.event.inputs.environment }}.tfvars" -auto-approve
         working-directory: ${{ env.TF_WORKING_DIR }}
